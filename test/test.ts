@@ -74,6 +74,53 @@ describe("Token contract", function () {
       expect(addr1Balance1).to.equal(ethers.utils.parseEther('455'));
       });
 
+      it("Should claim x1.5", async function () {
+        await stToken.approve(contr.address, ethers.utils.parseEther('100'));
+        await contr.stake(ethers.utils.parseEther('50'));
+        await ethers.provider.send('evm_increaseTime', [(1.5*delay + 1) * 60]);
+        await ethers.provider.send('evm_mine', []);
+        await contr.connect(owner).claim();
+        const addr1Balance1 = await rwToken.balanceOf(owner.address);
+        expect(addr1Balance1).to.equal(ethers.utils.parseEther('455'));
+        });
+
+
+      it("Should claim x2", async function () {
+        await stToken.approve(contr.address, ethers.utils.parseEther('100'));
+        await contr.stake(ethers.utils.parseEther('50'));
+        await ethers.provider.send('evm_increaseTime', [(2*delay + 1) * 60]);
+        await ethers.provider.send('evm_mine', []);
+        await contr.connect(owner).claim();
+        const addr1Balance1 = await rwToken.balanceOf(owner.address);
+        expect(addr1Balance1).to.equal(ethers.utils.parseEther('460'));
+        });
+
+        it("Should stake stake claim", async function () {
+          await stToken.approve(contr.address, ethers.utils.parseEther('100'));
+          await contr.stake(ethers.utils.parseEther('50'));
+          await ethers.provider.send('evm_increaseTime', [(delay + 1) * 60]);
+          await ethers.provider.send('evm_mine', []);
+          await contr.stake(ethers.utils.parseEther('50'));          
+          await ethers.provider.send('evm_increaseTime', [(delay + 1) * 60]);
+          await ethers.provider.send('evm_mine', []);
+          await contr.connect(owner).claim();          
+          const addr1Balance1 = await rwToken.balanceOf(owner.address);
+          expect(addr1Balance1).to.equal(ethers.utils.parseEther('415'));
+          });
+
+          it("Should claim after unstake", async function () {
+            await stToken.approve(contr.address, ethers.utils.parseEther('100'));
+            await contr.stake(ethers.utils.parseEther('50'));
+            await ethers.provider.send('evm_increaseTime', [(delay + 1) * 60]);
+            await ethers.provider.send('evm_mine', []);
+            await contr.unstake();
+            await contr.claim();          
+            const addr1Balance1 = await rwToken.balanceOf(owner.address);
+            expect(addr1Balance1).to.equal(ethers.utils.parseEther('505'));
+            });
+            
+        
+
       it("Should fail unstake (not enough token)", async function () {
         await expect(
           contr.connect(addr1).unstake()
