@@ -72,7 +72,7 @@ describe("Token contract", function () {
       await contr.connect(owner).claim();
       const addr1Balance1 = await rwToken.balanceOf(owner.address);
       expect(addr1Balance1).to.equal(ethers.utils.parseEther('455'));
-      });
+    });
 
       it("Should claim x1.5", async function () {
         await stToken.approve(contr.address, ethers.utils.parseEther('100'));
