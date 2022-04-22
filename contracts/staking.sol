@@ -46,7 +46,7 @@ contract stakingLP {
         require (_balances[msg.sender].exist, "No enough token 1");        
         require (_balances[msg.sender].amount > 0, "No enough token 2");        
         require (_balances[msg.sender].amount > _balances[msg.sender].amountPay, "No enough token 3");
-//        require((block.timestamp - _balances[msg.sender].startTime) / 60 / 60 > time_reward , "Timing error");                
+        require((block.timestamp - _balances[msg.sender].startTime) / 60 > time_reward , "Timing error");                
         //выводим ревард токены
         //transfer amount - amountPay
         uint256 toPay = (_balances[msg.sender].amount - _balances[msg.sender].amountPay) / 100 * percent;
@@ -58,7 +58,7 @@ contract stakingLP {
 
     function unstake() public returns (bool success) {
         require (_balances[msg.sender].amount > 0, "No enough token");
-//        require((block.timestamp - _balances[msg.sender].startTime) / 60 / 60 > time_staking, "Timing error");                        
+        require((block.timestamp - _balances[msg.sender].startTime) / 60  > time_staking, "Timing error");                        
 //выводим lp токены
         ERC20(st_token).transfer(msg.sender, _balances[msg.sender].amount);
         _balances[msg.sender].amountPay = 0;        

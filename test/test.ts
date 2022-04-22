@@ -15,6 +15,7 @@ describe("Token contract", function () {
   let addr1 : SignerWithAddress;
   let addr2 : SignerWithAddress;
   let addrs : SignerWithAddress[];
+  const delay : number = 10
 
   beforeEach(async function () {
     Token = await ethers.getContractFactory("m63");
@@ -22,7 +23,7 @@ describe("Token contract", function () {
     [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
     stToken = await Token.deploy('platinum', 'PL', 18, ethers.utils.parseEther('500'));
     rwToken = stToken;    
-    contr = await Contr.deploy(stToken.address, rwToken.address, 10, 10, 10);
+    contr = await Contr.deploy(stToken.address, rwToken.address, delay, delay, 10);
   });
 
   describe("Deployment", function () {
@@ -53,7 +54,9 @@ describe("Token contract", function () {
       const addr1Balance = await stToken.balanceOf(owner.address);
       const contrBalance = await stToken.balanceOf(contr.address);
       expect(addr1Balance).to.equal(ethers.utils.parseEther('450'));
-      expect(contrBalance).to.equal(ethers.utils.parseEther('50'));      
+      expect(contrBalance).to.equal(ethers.utils.parseEther('50'));
+      await ethers.provider.send('evm_increaseTime', [(delay + 1) * 60]);
+      await ethers.provider.send('evm_mine', []);
       await contr.unstake();
       const addr1Balance1 = await stToken.balanceOf(owner.address);
       const contrBalance1 = await stToken.balanceOf(contr.address);
@@ -64,22 +67,41 @@ describe("Token contract", function () {
     it("Should claim", async function () {
       await stToken.approve(contr.address, ethers.utils.parseEther('100'));
       await contr.stake(ethers.utils.parseEther('50'));
+      await ethers.provider.send('evm_increaseTime', [(delay + 1) * 60]);
+      await ethers.provider.send('evm_mine', []);
       await contr.connect(owner).claim();
       const addr1Balance1 = await rwToken.balanceOf(owner.address);
       expect(addr1Balance1).to.equal(ethers.utils.parseEther('455'));
       });
 
-      it("Should fail unstake", async function () {
+      it("Should fail unstake (not enough token)", async function () {
         await expect(
           contr.connect(addr1).unstake()
         ).to.be.revertedWith("No enough token");
       });
 
-      it("Should fail claim", async function () {
+      it("Should fail claim (not enough token)", async function () {
         await expect(
           contr.connect(addr1).unstake()
         ).to.be.revertedWith("No enough token");
       });
+
+      it("Should fail unstake (not enough time)", async function () {
+        await stToken.approve(contr.address, ethers.utils.parseEther('100'));
+        await contr.stake(ethers.utils.parseEther('50'));
+        await expect(
+          contr.unstake()
+        ).to.be.revertedWith("Timing error");
+      });
+
+      it("Should fail claim (not enough time)", async function () {
+        await stToken.approve(contr.address, ethers.utils.parseEther('100'));
+        await contr.stake(ethers.utils.parseEther('50'));
+        await expect(
+          contr.unstake()
+        ).to.be.revertedWith("Timing error");
+      });
+
 
     });
 
