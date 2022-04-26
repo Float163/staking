@@ -37,10 +37,7 @@ const config: HardhatUserConfig = {
       {
         version: "0.6.6",
       }]},
-  
-  
-
-      networks: {
+     networks: {
         ropsten: {
           url: `https://eth-ropsten.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
           accounts:
@@ -48,11 +45,9 @@ const config: HardhatUserConfig = {
         },
         rinkeby: {
           url: `https://eth-rinkeby.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+//          url: `https://rinkeby.infura.io/v3/${process.env.INFURA_ID}`, //Infura url with projectId
           accounts: process.env.RINKEBY_PRIVATE_KEY !== undefined ? [process.env.RINKEBY_PRIVATE_KEY] : [],
-          gas: 2100000,
-          gasPrice: 8000000,
-//          gas : 268620,
-//          gasPrice: 1000000000,
+          gasPrice: "auto",
         },
         hardhat: {
           chainId: 1337

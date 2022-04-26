@@ -1,30 +1,21 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
 import { ethers } from "hardhat";
 
 async function main() {
-  // Hardhat always runs the compile task when running scripts with its command
-  // line interface.
-  //
-  // If this script is run directly using `node` you may want to call compile
-  // manually to make sure everything is compiled
-  // await hre.run('compile');
-
-  // We get the contract to deploy
   const M63 = await ethers.getContractFactory("m63");
-  const m63 = await M63.deploy('platinum', 'PL', 18, ethers.utils.parseEther('10'));
+  const m63 = await M63.deploy('TokenA1', 'TKA1', 18, ethers.utils.parseEther('500'));
 
   await m63.deployed();
 
-  console.log("M63 deployed to:", m63.address);
+  const M631 = await ethers.getContractFactory("m63");
+  const m631 = await M631.deploy('TokenB1', 'TKB1', 18, ethers.utils.parseEther('500'));
+
+  await m631.deployed();
+
+  console.log("TKA1 deployed to:", m63.address);  
+  console.log("TKB1 deployed to:", m631.address);
 
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
